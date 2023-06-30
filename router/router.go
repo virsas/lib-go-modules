@@ -19,10 +19,9 @@ func New(assets string) (*gin.Engine, error) {
 	debugLoggingValue, debugLoggingPresent := os.LookupEnv("GIN_DEBUG")
 	if debugLoggingPresent {
 		debugLoggingValueBool, err := strconv.ParseBool(debugLoggingValue)
-		if err != nil {
-			debugLogging = false
+		if err == nil {
+			debugLogging = debugLoggingValueBool
 		}
-		debugLogging = debugLoggingValueBool
 	}
 
 	if debugLogging {
@@ -32,9 +31,7 @@ func New(assets string) (*gin.Engine, error) {
 	}
 
 	r := gin.Default()
-
 	r.Use(cors.New(getCors()))
-
 	r.Use(ginzap.Ginzap(logger, time.RFC3339, true))
 	r.Use(ginzap.RecoveryWithZap(logger, true))
 	r.Use(favicon.New(assets + "/favicon.ico"))
