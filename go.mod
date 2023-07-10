@@ -1,4 +1,4 @@
-module github.com/virsas/lib-go-utilities
+module github.com/virsas/lib-go-modules
 
 go 1.20
 
