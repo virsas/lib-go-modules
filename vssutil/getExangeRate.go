@@ -1,4 +1,4 @@
-package utils
+package vssutil
 
 import (
 	"bufio"
@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func GetRate(cur string) (float64, error) {
+func GetExangeRate(cur string) (float64, error) {
 	var err error
 	var rate string
 

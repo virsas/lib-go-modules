@@ -1,4 +1,4 @@
-package vars
+package vssvar
 
 import "net/http"
 
