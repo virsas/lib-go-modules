@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func GetExangeRate(cur string) (float64, error) {
+func GetExchangeRate(cur string) (float64, error) {
 	var err error
 	var rate string
 
