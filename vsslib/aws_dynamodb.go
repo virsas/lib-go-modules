@@ -22,7 +22,7 @@ type dynamo struct {
 	table   string
 }
 
-func NewDynamoSession(sess *session.Session) (DynamoHandler, error) {
+func NewDynamoDBSession(sess *session.Session) (DynamoHandler, error) {
 	var dynamoTable string = ""
 	dynamoTableValue, dynamoTablePresent := os.LookupEnv("AWS_DYNAMO_TABLE")
 	if dynamoTablePresent {

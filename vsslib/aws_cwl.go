@@ -24,7 +24,7 @@ type cwl struct {
 	stream  string
 }
 
-func NewCloudwatchSess(sess *session.Session) (CWLHandler, error) {
+func NewCloudwatchLogSess(sess *session.Session) (CWLHandler, error) {
 	var err error
 
 	var cwGroup string = ""
