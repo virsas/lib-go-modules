@@ -3,6 +3,7 @@ package vsslib
 import (
 	"errors"
 	"os"
+	"strings"
 
 	"github.com/golang-jwt/jwt"
 )
@@ -42,6 +43,19 @@ func JWTEncode(claims jwt.MapClaims) (string, error) {
 	}
 
 	return signedString, nil
+}
+
+func JWTToken(authorizationToken string) (string, error) {
+	var token string
+
+	splitToken := strings.Split(authorizationToken, "Bearer")
+
+	if len(splitToken) != 2 {
+		return "", errors.New("authorization header issue")
+	}
+
+	token = strings.TrimSpace(splitToken[1])
+	return token, nil
 }
 
 func JWTDecode(token string) (jwt.MapClaims, error) {
