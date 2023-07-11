@@ -13,7 +13,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func NewRouter(assets string) (*gin.Engine, error) {
+func NewRouter(assetsPath string) (*gin.Engine, error) {
 	logger, _ := zap.NewProduction()
 
 	var debugLogging bool = false
@@ -35,7 +35,7 @@ func NewRouter(assets string) (*gin.Engine, error) {
 	r.Use(cors.New(getCors()))
 	r.Use(ginzap.Ginzap(logger, time.RFC3339, true))
 	r.Use(ginzap.RecoveryWithZap(logger, true))
-	r.Use(favicon.New(assets + "/favicon.ico"))
+	r.Use(favicon.New(assetsPath + "/favicon.ico"))
 
 	return r, nil
 }
@@ -55,7 +55,7 @@ func getCors() cors.Config {
 		methodsAllowed = methodsAllowedValue
 	}
 
-	var headersAllowed string = "Authorization, Content-Type"
+	var headersAllowed string = "Authorization, Content-Type, Cache-Control"
 	headersAllowedValue, headersAllowedPresent := os.LookupEnv("CORS_HEADERS")
 	if headersAllowedPresent {
 		headersAllowed = headersAllowedValue
