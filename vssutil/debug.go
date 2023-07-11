@@ -2,6 +2,7 @@ package vssutil
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -22,9 +23,7 @@ func DebugClaims(claims jwt.MapClaims) {
 		claimsDebug = claimsDebugValueBool
 	}
 	if claimsDebug {
-		fmt.Println("######### Log Claims Function #########")
-		fmt.Println(claims)
-		fmt.Println("######### Log Claims Function #########")
+		debug(claims, "Log Claims Function")
 	}
 }
 
@@ -49,8 +48,31 @@ func DebugRequestBody(c *gin.Context) {
 			"Body":     string(data),
 		}
 
-		fmt.Println("######### Log Request Body #########")
-		fmt.Println(body)
-		fmt.Println("######### Log Request Body #########")
+		debug(body, "Log Request Body")
 	}
+}
+
+func debug(output interface{}, msg string) {
+	var prettyDebug bool = true
+	prettyDebugValue, prettyDebugPresent := os.LookupEnv("PRETTY_DEBUG")
+	if prettyDebugPresent {
+		prettyDebugValueBool, err := strconv.ParseBool(prettyDebugValue)
+		if err != nil {
+			prettyDebug = false
+		}
+		prettyDebug = prettyDebugValueBool
+	}
+
+	fmt.Println("######### ", msg, " #########")
+	if prettyDebug {
+		prettyOutput, err := json.MarshalIndent(output, "", "    ")
+		if err != nil {
+			fmt.Println(output)
+		} else {
+			fmt.Println(string(prettyOutput))
+		}
+	} else {
+		fmt.Println(output)
+	}
+	fmt.Println("######### ", msg, " #########")
 }
