@@ -1,4 +1,4 @@
-package test
+package vsstest
 
 import (
 	"net/http"
