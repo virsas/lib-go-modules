@@ -12,12 +12,20 @@ func NewAWSSession(op OpHandler) (*session.Session, error) {
 	var err error
 	var sess *session.Session
 
-	awsID, err := op.Get("acc_aws_iam_user", "username")
+	var opAWSUser string = ""
+	opAWSUserValue, opAWSUserPresent := os.LookupEnv("OP_AWS_USER")
+	if opAWSUserPresent {
+		opAWSUser = opAWSUserValue
+	} else {
+		panic("Missing ENV Variable OP_AWS_USER")
+	}
+
+	awsID, err := op.Get(opAWSUser, "username")
 	if err != nil {
 		return nil, err
 	}
 
-	awsKey, err := op.Get("acc_aws_iam_user", "password")
+	awsKey, err := op.Get(opAWSUser, "password")
 	if err != nil {
 		return nil, err
 	}
