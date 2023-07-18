@@ -3,7 +3,6 @@ package vsslib
 import (
 	"errors"
 	"log"
-	"os"
 
 	"github.com/1Password/connect-sdk-go/connect"
 	"github.com/1Password/connect-sdk-go/onepassword"
@@ -18,33 +17,8 @@ type op struct {
 	vault  string
 }
 
-func NewOPSession() (OpHandler, error) {
+func NewOPSession(opURL string, opToken string, opVault string) (OpHandler, error) {
 	var err error
-
-	var opURL string = ""
-	opURLValue, opURLPresent := os.LookupEnv("OP_URL")
-	if opURLPresent {
-		opURL = opURLValue
-	} else {
-		panic("Missing ENV Variable OP_URL")
-	}
-
-	var opToken string = ""
-	opTokenValue, opTokenPresent := os.LookupEnv("OP_TOKEN")
-	if opTokenPresent {
-		opToken = opTokenValue
-	} else {
-		panic("Missing ENV Variable OP_TOKEN")
-	}
-
-	var opVault string = ""
-	opVaultValue, opVaultPresent := os.LookupEnv("OP_VAULT")
-	if opVaultPresent {
-		opVault = opVaultValue
-	} else {
-		panic("Missing ENV Variable OP_VAULT")
-	}
-
 	client := connect.NewClient(opURL, opToken)
 
 	vaults, err := client.GetVaults()
