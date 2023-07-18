@@ -8,17 +8,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 )
 
-func NewAWSSession(op OpHandler) (*session.Session, error) {
+func NewAWSSession(op OpHandler, opAWSUser string) (*session.Session, error) {
 	var err error
 	var sess *session.Session
-
-	var opAWSUser string = ""
-	opAWSUserValue, opAWSUserPresent := os.LookupEnv("OP_AWS_USER")
-	if opAWSUserPresent {
-		opAWSUser = opAWSUserValue
-	} else {
-		panic("Missing ENV Variable OP_AWS_USER")
-	}
 
 	awsID, err := op.Get(opAWSUser, "username")
 	if err != nil {
