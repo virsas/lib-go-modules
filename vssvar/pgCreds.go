@@ -12,7 +12,7 @@ type PGCreds struct {
 	Name string
 }
 
-func OPGCreds(op vsslib.OpHandler, opPGUser string) (PGCreds, error) {
+func OPPGCreds(op vsslib.OpHandler, opPGUser string) (PGCreds, error) {
 	var err error
 	var pgcreds PGCreds = PGCreds{}
 
