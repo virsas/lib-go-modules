@@ -13,7 +13,7 @@ func NewPostgresSession(dbHost string, dbPort string, dbUser string, dbPass stri
 	var err error
 	var db *sql.DB
 
-	dbSource := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUser, dbPass, dbName)
+	dbSource := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s", dbHost, dbPort, dbUser, dbPass, dbName)
 	db, err = sql.Open("postgres", dbSource)
 	if err != nil {
 		return nil, err
