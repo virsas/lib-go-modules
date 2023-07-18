@@ -1,7 +1,6 @@
 package vsslib
 
 import (
-	"os"
 	"sync"
 	"time"
 
@@ -24,34 +23,18 @@ type cwl struct {
 	stream  string
 }
 
-func NewCloudwatchLogSess(sess *session.Session) (CWLHandler, error) {
+func NewCloudwatchLogSess(sess *session.Session, group string, stream string) (CWLHandler, error) {
 	var err error
 
-	var cwGroup string = ""
-	cwGroupValue, cwGroupPresent := os.LookupEnv("AWS_CW_GROUP")
-	if cwGroupPresent {
-		cwGroup = cwGroupValue
-	} else {
-		panic("Missing ENV Variable AWS_CW_GROUP")
-	}
-
-	var cwStream string = ""
-	cwStreamValue, cwStreamPresent := os.LookupEnv("AWS_CW_STREAM")
-	if cwStreamPresent {
-		cwStream = cwStreamValue
-	} else {
-		panic("Missing ENV Variable AWS_CW_STREAM")
-	}
-
 	cwsess := cloudwatchlogs.New(sess)
-	cwh := &cwl{session: cwsess, mutex: &sync.Mutex{}, token: nil, group: cwGroup, stream: cwStream}
+	cwh := &cwl{session: cwsess, mutex: &sync.Mutex{}, token: nil, group: group, stream: stream}
 
-	err = createCWLGroup(cwsess, cwGroup)
+	err = createCWLGroup(cwsess, group)
 	if err != nil {
 		return nil, err
 	}
 
-	err = createCWLStream(cwsess, cwGroup, cwStream)
+	err = createCWLStream(cwsess, group, stream)
 	if err != nil {
 		return nil, err
 	}
