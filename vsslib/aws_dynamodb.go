@@ -1,8 +1,6 @@
 package vsslib
 
 import (
-	"os"
-
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -22,24 +20,7 @@ type dynamo struct {
 	table   string
 }
 
-func NewDynamoDBSession(sess *session.Session) (DynamoHandler, error) {
-	var dynamoTable string = ""
-	dynamoTableValue, dynamoTablePresent := os.LookupEnv("AWS_DYNAMO_TABLE")
-	if dynamoTablePresent {
-		dynamoTable = dynamoTableValue
-	} else {
-		panic("Missing ENV Variable AWS_DYNAMO_TABLE")
-	}
-
-	ddb, err := newDynamoSession(sess, dynamoTable)
-	if err != nil {
-		return nil, err
-	}
-
-	return ddb, nil
-}
-
-func newDynamoSession(sess *session.Session, table string) (DynamoHandler, error) {
+func NewDynamoDBSession(sess *session.Session, table string) (DynamoHandler, error) {
 	ddbsess := dynamodb.New(sess)
 	ddb := &dynamo{session: ddbsess, table: table}
 
