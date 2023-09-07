@@ -2,36 +2,16 @@ package vsslib
 
 import (
 	"errors"
-	"os"
 	"strings"
 
 	"github.com/golang-jwt/jwt"
 )
 
-func JWTEncode(claims jwt.MapClaims) (string, error) {
+func JWTEncode(claims jwt.MapClaims, privateKey []byte) (string, error) {
 	var err error
 	var signedString string
 
-	var rootPath string = "./"
-	rootPathValue, rootPathPresent := os.LookupEnv("ROOT_PATH")
-	if rootPathPresent {
-		rootPath = rootPathValue
-	}
-
-	var keyPrefix string = "production"
-	keyPrefixValue, keyPrefixPresent := os.LookupEnv("KEY_PREFIX")
-	if keyPrefixPresent {
-		keyPrefix = keyPrefixValue
-	}
-
-	var privKeyPath = rootPath + "keys/" + keyPrefix + "_jwtRS256.key"
-
-	signBytes, err := os.ReadFile(privKeyPath)
-	if err != nil {
-		return signedString, err
-	}
-
-	signKey, err := jwt.ParseRSAPrivateKeyFromPEM(signBytes)
+	signKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKey)
 	if err != nil {
 		return signedString, err
 	}
@@ -58,34 +38,10 @@ func JWTToken(authorizationToken string) (string, error) {
 	return token, nil
 }
 
-func JWTDecode(token string) (jwt.MapClaims, error) {
+func JWTDecode(token string, publicKey []byte) (jwt.MapClaims, error) {
 	var err error
 
-	var rootPath string = "./"
-	rootPathValue, rootPathPresent := os.LookupEnv("ROOT_PATH")
-	if rootPathPresent {
-		rootPath = rootPathValue
-	}
-
-	var keyPrefix string = "production"
-	keyPrefixValue, keyPrefixPresent := os.LookupEnv("KEY_PREFIX")
-	if keyPrefixPresent {
-		keyPrefix = keyPrefixValue
-	}
-
-	var pubKeyPath = rootPath + "keys/" + keyPrefix + "_jwtRS256.pub"
-
-	verifyBytes, err := os.ReadFile(pubKeyPath)
-	if err != nil {
-		return nil, err
-	}
-
-	verifyKey, err := jwt.ParseRSAPublicKeyFromPEM(verifyBytes)
-	if err != nil {
-		return nil, err
-	}
-
-	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) { return verifyKey, nil })
+	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) { return publicKey, nil })
 	if err != nil {
 		validationError, _ := err.(*jwt.ValidationError)
 		if validationError.Errors == jwt.ValidationErrorExpired {
