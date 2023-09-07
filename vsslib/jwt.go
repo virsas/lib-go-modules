@@ -1,23 +1,19 @@
 package vsslib
 
 import (
+	"crypto/rsa"
 	"errors"
 	"strings"
 
 	"github.com/golang-jwt/jwt"
 )
 
-func JWTEncode(claims jwt.MapClaims, privateKey []byte) (string, error) {
+func JWTEncode(claims jwt.MapClaims, privateKey *rsa.PrivateKey) (string, error) {
 	var err error
 	var signedString string
 
-	signKey, err := jwt.ParseRSAPrivateKeyFromPEM(privateKey)
-	if err != nil {
-		return signedString, err
-	}
-
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
-	signedString, err = token.SignedString(signKey)
+	signedString, err = token.SignedString(privateKey)
 	if err != nil {
 		return signedString, err
 	}
@@ -38,7 +34,7 @@ func JWTToken(authorizationToken string) (string, error) {
 	return token, nil
 }
 
-func JWTDecode(token string, publicKey []byte) (jwt.MapClaims, error) {
+func JWTDecode(token string, publicKey *rsa.PublicKey) (jwt.MapClaims, error) {
 	var err error
 
 	parsedToken, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) { return publicKey, nil })
