@@ -12,31 +12,31 @@ type PGCreds struct {
 	Name string
 }
 
-func OPPGCreds(op vsslib.OpHandler, opPGUser string) (PGCreds, error) {
+func OPPGCreds(op vsslib.OpHandler, opPGItem string) (PGCreds, error) {
 	var err error
 	var pgcreds PGCreds = PGCreds{}
 
-	pgcreds.Host, err = op.Get(opPGUser, "hostname")
+	pgcreds.Host, err = op.Get(opPGItem, "hostname")
 	if err != nil {
 		return pgcreds, err
 	}
 
-	pgcreds.Port, err = op.Get(opPGUser, "port")
+	pgcreds.Port, err = op.Get(opPGItem, "port")
 	if err != nil {
 		return pgcreds, err
 	}
 
-	pgcreds.User, err = op.Get(opPGUser, "username")
+	pgcreds.User, err = op.Get(opPGItem, "username")
 	if err != nil {
 		return pgcreds, err
 	}
 
-	pgcreds.Pass, err = op.Get(opPGUser, "password")
+	pgcreds.Pass, err = op.Get(opPGItem, "password")
 	if err != nil {
 		return pgcreds, err
 	}
 
-	pgcreds.Name, err = op.Get(opPGUser, "database")
+	pgcreds.Name, err = op.Get(opPGItem, "database")
 	if err != nil {
 		return pgcreds, err
 	}

@@ -12,16 +12,16 @@ type AWSCreds struct {
 	Region string
 }
 
-func OPAWSCreds(op vsslib.OpHandler, opAWSUser string) (AWSCreds, error) {
+func OPAWSCreds(op vsslib.OpHandler, opAWSItem string) (AWSCreds, error) {
 	var err error
 	var awscreds AWSCreds = AWSCreds{}
 
-	awscreds.ID, err = op.Get(opAWSUser, "username")
+	awscreds.ID, err = op.Get(opAWSItem, "username")
 	if err != nil {
 		return awscreds, err
 	}
 
-	awscreds.Key, err = op.Get(opAWSUser, "password")
+	awscreds.Key, err = op.Get(opAWSItem, "password")
 	if err != nil {
 		return awscreds, err
 	}
