@@ -6,6 +6,7 @@ import (
 
 type Auth0RoleHandler interface {
 	List() ([]Role, error)
+	Show(id string) (Role, error)
 }
 
 type auth0role struct {
