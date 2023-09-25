@@ -40,11 +40,6 @@ func (a *auth0role) List() ([]Role, error) {
 		}
 
 		for _, authRole := range list.Roles {
-			users, err := a.session.Role.Users(authRole.GetID())
-			if err != nil {
-				return roles, err
-			}
-			role.Users = len(users.Users)
 			role.ID = authRole.GetID()
 			role.Name = authRole.GetName()
 			role.Description = authRole.GetDescription()
@@ -59,4 +54,26 @@ func (a *auth0role) List() ([]Role, error) {
 	}
 
 	return roles, err
+}
+
+func (a *auth0role) Show(id string) (Role, error) {
+	var err error
+	var role Role
+
+	authRole, err := a.session.Role.Read(id)
+	if err != nil {
+		return role, err
+	}
+
+	role.ID = authRole.GetID()
+	role.Name = authRole.GetName()
+	role.Description = authRole.GetDescription()
+
+	users, err := a.session.Role.Users(authRole.GetID())
+	if err != nil {
+		return role, err
+	}
+	role.Users = len(users.Users)
+
+	return role, nil
 }
