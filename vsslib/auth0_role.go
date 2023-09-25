@@ -16,6 +16,7 @@ type Role struct {
 	ID          string `json:"id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
+	Users       int    `json:"users"`
 }
 
 func NewAuth0RoleSess(sess *management.Management) Auth0RoleHandler {
@@ -39,6 +40,11 @@ func (a *auth0role) List() ([]Role, error) {
 		}
 
 		for _, authRole := range list.Roles {
+			users, err := a.session.Role.Users(authRole.GetID())
+			if err != nil {
+				return roles, err
+			}
+			role.Users = len(users.Users)
 			role.ID = authRole.GetID()
 			role.Name = authRole.GetName()
 			role.Description = authRole.GetDescription()
