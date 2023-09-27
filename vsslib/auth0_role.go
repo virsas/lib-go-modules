@@ -14,10 +14,11 @@ type auth0role struct {
 }
 
 type Role struct {
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Users       int    `json:"users"`
+	ID          string   `json:"id"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Users       []string `json:"users"`
+	UsersCount  int      `json:"usersCount"`
 }
 
 func NewAuth0RoleSess(sess *management.Management) Auth0RoleHandler {
@@ -74,7 +75,11 @@ func (a *auth0role) Show(id string) (Role, error) {
 	if err != nil {
 		return role, err
 	}
-	role.Users = len(users.Users)
+	role.UsersCount = len(users.Users)
+
+	for _, u := range users.Users {
+		role.Users = append(role.Users, *u.Name)
+	}
 
 	return role, nil
 }
