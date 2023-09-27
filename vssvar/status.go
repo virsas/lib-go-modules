@@ -20,24 +20,14 @@ func (r *StatusErr) Unwrap() error {
 
 const STATUS_OK_STRING = "OK"
 const STATUS_OK_CODE = http.StatusOK
-const STATUS_TOTP_REQUIRED_STRING = "totpRequired"
-const STATUS_TOTP_REQUIRED_CODE = http.StatusAccepted
 const STATUS_SERVER_ERROR_STRING = "apiError"
 const STATUS_SERVER_ERROR_CODE = http.StatusInternalServerError
 const STATUS_DB_ERROR_STRING = "dbError"
 const STATUS_DB_ERROR_CODE = http.StatusInternalServerError
 const STATUS_EMAIL_ERROR_STRING = "emailError"
 const STATUS_EMAIL_ERROR_CODE = http.StatusInternalServerError
-const STATUS_LOCKED_ERROR_STRING = "lockedAccount"
-const STATUS_LOCKED_ERROR_CODE = http.StatusForbidden
 const STATUS_FORBIDDEN_ERROR_STRING = "notAllowed"
 const STATUS_FORBIDDEN_ERROR_CODE = http.StatusForbidden
-const STATUS_CONFIRM_ERROR_STRING = "notConfirmed"
-const STATUS_CONFIRM_ERROR_CODE = http.StatusForbidden
-const STATUS_EXPIRED_ERROR_STRING = "expiredError"
-const STATUS_EXPIRED_ERROR_CODE = http.StatusForbidden
-const STATUS_LOGIN_ERROR_STRING = "loginError"
-const STATUS_LOGIN_ERROR_CODE = http.StatusUnauthorized
 const STATUS_REQUEST_ERROR_STRING = "badRequest"
 const STATUS_REQUEST_ERROR_CODE = http.StatusBadRequest
 const STATUS_VALIDATION_ERROR_STRING = "validationError"
@@ -48,6 +38,8 @@ const STATUS_DUPLICATION_ERROR_STRING = "duplicationError"
 const STATUS_DUPLICATION_ERROR_CODE = http.StatusConflict
 const STATUS_CONFLICT_ERROR_STRING = "conflictError"
 const STATUS_CONFLICT_ERROR_CODE = http.StatusConflict
+const STATUS_EMPTY_ERROR_STRING = "notEmpty"
+const STATUS_EMPTY_ERROR_CODE = http.StatusConflict
 
 func StatusOK(err error) error {
 	return &StatusErr{STATUS_OK_CODE, STATUS_OK_STRING, err}
@@ -61,23 +53,8 @@ func StatusDBError(err error) error {
 func StatusEmailError(err error) error {
 	return &StatusErr{STATUS_EMAIL_ERROR_CODE, STATUS_EMAIL_ERROR_STRING, err}
 }
-func StatusTOTPRequired(err error) error {
-	return &StatusErr{STATUS_TOTP_REQUIRED_CODE, STATUS_TOTP_REQUIRED_STRING, err}
-}
-func StatusLockedError(err error) error {
-	return &StatusErr{STATUS_LOCKED_ERROR_CODE, STATUS_LOCKED_ERROR_STRING, err}
-}
 func StatusForbiddenError(err error) error {
 	return &StatusErr{STATUS_FORBIDDEN_ERROR_CODE, STATUS_FORBIDDEN_ERROR_STRING, err}
-}
-func StatusConfirmError(err error) error {
-	return &StatusErr{STATUS_CONFIRM_ERROR_CODE, STATUS_CONFIRM_ERROR_STRING, err}
-}
-func StatusLoginError(err error) error {
-	return &StatusErr{STATUS_LOGIN_ERROR_CODE, STATUS_LOGIN_ERROR_STRING, err}
-}
-func StatusExpiredError(err error) error {
-	return &StatusErr{STATUS_EXPIRED_ERROR_CODE, STATUS_EXPIRED_ERROR_STRING, err}
 }
 func StatusRequestError(err error) error {
 	return &StatusErr{STATUS_REQUEST_ERROR_CODE, STATUS_REQUEST_ERROR_STRING, err}
@@ -93,4 +70,7 @@ func StatusDuplicationError(err error) error {
 }
 func StatusConflictError(err error) error {
 	return &StatusErr{STATUS_CONFLICT_ERROR_CODE, STATUS_CONFLICT_ERROR_STRING, err}
+}
+func StatusEmptyError(err error) error {
+	return &StatusErr{STATUS_EMPTY_ERROR_CODE, STATUS_EMPTY_ERROR_STRING, err}
 }
