@@ -16,7 +16,7 @@ type Auth0Handler interface {
 	RoleDelete(id string) error
 	UserList() ([]*management.User, error)
 	UserShow(id string) (*management.User, error)
-	UserCreate(name string, email string, connection string) error
+	UserCreate(name string, email string) error
 	UserUpdate(id string, name string, description string) error
 	UserBlock(id string) error
 	UserUnblock(id string) error
@@ -24,7 +24,11 @@ type Auth0Handler interface {
 }
 
 type auth0Struct struct {
-	session *management.Management
+	session    *management.Management
+	client     string
+	secret     string
+	domain     string
+	connection string
 }
 
 type Auth0Role struct {
@@ -34,7 +38,7 @@ type Auth0Role struct {
 	AuthUsers   []*management.User `json:"authUsers"`
 }
 
-func NewAuth0Session(domain string, client string, secret string) (Auth0Handler, error) {
+func NewAuth0Session(domain string, client string, secret string, connection string) (Auth0Handler, error) {
 	var err error
 	var session *management.Management
 
@@ -43,7 +47,7 @@ func NewAuth0Session(domain string, client string, secret string) (Auth0Handler,
 		return nil, err
 	}
 
-	a := &auth0Struct{session: session}
+	a := &auth0Struct{session: session, client: client, secret: secret, domain: domain, connection: connection}
 
 	return a, nil
 }
@@ -189,14 +193,14 @@ func (a *auth0Struct) UserShow(id string) (*management.User, error) {
 	return user, nil
 }
 
-func (a *auth0Struct) UserCreate(name string, email string, connection string) error {
+func (a *auth0Struct) UserCreate(name string, email string) error {
 	var err error
 
 	u := &management.User{
 		Name:        auth0.String(name),
 		Email:       auth0.String(email),
 		Password:    auth0.String(vssutil.RandomString(32, "v1*:")),
-		Connection:  auth0.String(connection),
+		Connection:  auth0.String(a.connection),
 		VerifyEmail: auth0.Bool(false),
 	}
 
