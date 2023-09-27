@@ -11,6 +11,7 @@ type Auth0RoleHandler interface {
 	List() ([]Role, error)
 	Show(id string) (Role, error)
 	Create(name string, description string) error
+	Update(id string, name string, description string) error
 	Delete(id string) error
 }
 
@@ -93,6 +94,22 @@ func (a *auth0role) Create(name string, description string) error {
 	}
 
 	err = a.session.Role.Create(r)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *auth0role) Update(id string, name string, description string) error {
+	var err error
+
+	r := &management.Role{
+		Name:        auth0.String(name),
+		Description: auth0.String(description),
+	}
+
+	err = a.session.Role.Update(id, r)
 	if err != nil {
 		return err
 	}
