@@ -11,6 +11,7 @@ type Auth0RoleHandler interface {
 	List() ([]Role, error)
 	Show(id string) (Role, error)
 	Create(name string, description string) error
+	Delete(id string) error
 }
 
 type auth0role struct {
