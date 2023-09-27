@@ -1,12 +1,14 @@
 package vsslib
 
 import (
+	"gopkg.in/auth0.v5"
 	"gopkg.in/auth0.v5/management"
 )
 
 type Auth0RoleHandler interface {
 	List() ([]Role, error)
 	Show(id string) (Role, error)
+	Create(name string, description string) error
 }
 
 type auth0role struct {
@@ -77,4 +79,20 @@ func (a *auth0role) Show(id string) (Role, error) {
 	role.AuthUsers = users.Users
 
 	return role, nil
+}
+
+func (a *auth0role) Create(name string, description string) error {
+	var err error
+
+	r := &management.Role{
+		Name:        auth0.String(name),
+		Description: auth0.String(description),
+	}
+
+	err = a.session.Role.Create(r)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
