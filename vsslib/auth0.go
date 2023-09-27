@@ -3,6 +3,7 @@ package vsslib
 import (
 	"errors"
 
+	"github.com/virsas/lib-go-modules/vssutil"
 	"gopkg.in/auth0.v5"
 	"gopkg.in/auth0.v5/management"
 )
@@ -13,6 +14,13 @@ type Auth0Handler interface {
 	RoleCreate(name string, description string) error
 	RoleUpdate(id string, name string, description string) error
 	RoleDelete(id string) error
+	UserList() ([]*management.User, error)
+	UserShow(id string) (*management.User, error)
+	UserCreate(name string, email string, connection string) error
+	UserUpdate(id string, name string, description string) error
+	UserBlock(id string) error
+	UserUnblock(id string) error
+	UserDelete(id string) error
 }
 
 type auth0Struct struct {
@@ -138,6 +146,116 @@ func (a *auth0Struct) RoleDelete(id string) error {
 	}
 
 	err = a.session.Role.Delete(id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *auth0Struct) UserList() ([]*management.User, error) {
+	var err error
+	var users []*management.User = []*management.User{}
+
+	var page int = 0
+	for {
+		list, err := a.session.User.List(
+			management.Page(page),
+		)
+		if err != nil {
+			return users, err
+		}
+
+		users = append(users, list.Users...)
+
+		if !list.HasNext() {
+			break
+		}
+		page++
+	}
+
+	return users, err
+}
+
+func (a *auth0Struct) UserShow(id string) (*management.User, error) {
+	var err error
+	var user *management.User
+
+	user, err = a.session.User.Read(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func (a *auth0Struct) UserCreate(name string, email string, connection string) error {
+	var err error
+
+	u := &management.User{
+		Name:        auth0.String(name),
+		Email:       auth0.String(email),
+		Password:    auth0.String(vssutil.RandomString(32, "v1*:")),
+		Connection:  auth0.String(connection),
+		VerifyEmail: auth0.Bool(false),
+	}
+
+	err = a.session.User.Create(u)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *auth0Struct) UserUpdate(id string, name string, email string) error {
+	var err error
+
+	u := &management.User{
+		Name:  auth0.String(name),
+		Email: auth0.String(email),
+	}
+
+	err = a.session.User.Update(id, u)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *auth0Struct) UserBlock(id string) error {
+	var err error
+
+	u := &management.User{
+		Blocked: auth0.Bool(true),
+	}
+
+	err = a.session.User.Update(id, u)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *auth0Struct) UserUnblock(id string) error {
+	var err error
+
+	u := &management.User{
+		Blocked: auth0.Bool(false),
+	}
+
+	err = a.session.User.Update(id, u)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *auth0Struct) UserDelete(id string) error {
+	err := a.session.User.Delete(id)
 	if err != nil {
 		return err
 	}
