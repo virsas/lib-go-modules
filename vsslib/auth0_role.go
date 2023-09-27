@@ -1,6 +1,8 @@
 package vsslib
 
 import (
+	"errors"
+
 	"gopkg.in/auth0.v5"
 	"gopkg.in/auth0.v5/management"
 )
@@ -90,6 +92,26 @@ func (a *auth0role) Create(name string, description string) error {
 	}
 
 	err = a.session.Role.Create(r)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (a *auth0role) Delete(id string) error {
+	var err error
+
+	users, err := a.session.Role.Users(id)
+	if err != nil {
+		return err
+	}
+
+	if len(users.Users) > 0 {
+		return errors.New("notEmpty")
+	}
+
+	err = a.session.Role.Delete(id)
 	if err != nil {
 		return err
 	}
