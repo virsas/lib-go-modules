@@ -28,6 +28,10 @@ const STATUS_EMAIL_ERROR_STRING = "emailError"
 const STATUS_EMAIL_ERROR_CODE = http.StatusInternalServerError
 const STATUS_FORBIDDEN_ERROR_STRING = "notAllowed"
 const STATUS_FORBIDDEN_ERROR_CODE = http.StatusForbidden
+const STATUS_EXPIRED_ERROR_STRING = "expiredError"
+const STATUS_EXPIRED_ERROR_CODE = http.StatusForbidden
+const STATUS_LOGIN_ERROR_STRING = "loginError"
+const STATUS_LOGIN_ERROR_CODE = http.StatusUnauthorized
 const STATUS_REQUEST_ERROR_STRING = "badRequest"
 const STATUS_REQUEST_ERROR_CODE = http.StatusBadRequest
 const STATUS_VALIDATION_ERROR_STRING = "validationError"
@@ -55,6 +59,12 @@ func StatusEmailError(err error) error {
 }
 func StatusForbiddenError(err error) error {
 	return &StatusErr{STATUS_FORBIDDEN_ERROR_CODE, STATUS_FORBIDDEN_ERROR_STRING, err}
+}
+func StatusLoginError(err error) error {
+	return &StatusErr{STATUS_LOGIN_ERROR_CODE, STATUS_LOGIN_ERROR_STRING, err}
+}
+func StatusExpiredError(err error) error {
+	return &StatusErr{STATUS_EXPIRED_ERROR_CODE, STATUS_EXPIRED_ERROR_STRING, err}
 }
 func StatusRequestError(err error) error {
 	return &StatusErr{STATUS_REQUEST_ERROR_CODE, STATUS_REQUEST_ERROR_STRING, err}
