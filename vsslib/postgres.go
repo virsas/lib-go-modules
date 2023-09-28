@@ -6,6 +6,9 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
 )
 
@@ -44,4 +47,40 @@ func NewPostgresSession(dbHost string, dbPort string, dbUser string, dbPass stri
 	db.SetMaxIdleConns(idleConnection)
 
 	return db, nil
+}
+
+func PostgresMigrate(db *sql.DB, migrationDirectory string, migrationTable string, rollback bool) error {
+	var err error
+
+	driver, err := postgres.WithInstance(db, &postgres.Config{
+		MigrationsTable: migrationTable,
+	})
+	if err != nil {
+		return err
+	}
+
+	m, err := migrate.NewWithDatabaseInstance("file://"+migrationDirectory+"/", "postgres", driver)
+	if err != nil {
+		return err
+	}
+
+	if rollback {
+		err = m.Down()
+		if err != nil {
+			if err == migrate.ErrNoChange {
+				return nil
+			}
+			return err
+		}
+	} else {
+		err = m.Up()
+		if err != nil {
+			if err == migrate.ErrNoChange {
+				return nil
+			}
+			return err
+		}
+	}
+
+	return nil
 }
