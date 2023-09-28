@@ -19,7 +19,6 @@ type Auth0Handler interface {
 	UserCreate(name string, email string) error
 	UserUpdate(id string, name string, description string) error
 	UserBlock(id string) error
-	UserUnblock(id string) error
 	UserDelete(id string) error
 }
 
@@ -213,23 +212,15 @@ func (a *auth0Struct) UserUpdate(id string, name string, email string) error {
 func (a *auth0Struct) UserBlock(id string) error {
 	var err error
 
-	u := &management.User{
-		Blocked: auth0.Bool(true),
-	}
-
-	err = a.session.User.Update(id, u)
+	user, err := a.session.User.Read(id)
 	if err != nil {
 		return err
 	}
 
-	return nil
-}
-
-func (a *auth0Struct) UserUnblock(id string) error {
-	var err error
+	userBlocked := user.GetBlocked()
 
 	u := &management.User{
-		Blocked: auth0.Bool(false),
+		Blocked: auth0.Bool(!userBlocked),
 	}
 
 	err = a.session.User.Update(id, u)
