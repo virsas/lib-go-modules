@@ -49,8 +49,20 @@ func NewPostgresSession(dbHost string, dbPort string, dbUser string, dbPass stri
 	return db, nil
 }
 
-func PostgresMigrate(db *sql.DB, migrationDirectory string, migrationTable string, rollback bool) error {
+func PostgresMigrate(db *sql.DB, rollback bool) error {
 	var err error
+
+	var migrationDirectory string = "./migrations/"
+	migrationDirectoryValue, migrationDirectoryPresent := os.LookupEnv("DB_MIGRATIONS_PATH")
+	if migrationDirectoryPresent {
+		migrationDirectory = migrationDirectoryValue
+	}
+
+	var migrationTable string = "golang_migrations"
+	migrationTableValue, migrationTablePresent := os.LookupEnv("DB_MIGRATION_TABLE")
+	if migrationTablePresent {
+		migrationTable = migrationTableValue
+	}
 
 	driver, err := postgres.WithInstance(db, &postgres.Config{
 		MigrationsTable: migrationTable,
@@ -59,7 +71,7 @@ func PostgresMigrate(db *sql.DB, migrationDirectory string, migrationTable strin
 		return err
 	}
 
-	m, err := migrate.NewWithDatabaseInstance("file://"+migrationDirectory+"/", "postgres", driver)
+	m, err := migrate.NewWithDatabaseInstance("file://"+migrationDirectory, "postgres", driver)
 	if err != nil {
 		return err
 	}
