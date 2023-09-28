@@ -9,8 +9,8 @@ import (
 )
 
 type Auth0Handler interface {
-	RoleList() ([]Auth0Role, error)
-	RoleShow(id string) (Auth0Role, error)
+	RoleList() ([]*management.Role, error)
+	RoleShow(id string) (*management.Role, *management.UserList, error)
 	RoleCreate(name string, description string) error
 	RoleUpdate(id string, name string, description string) error
 	RoleDelete(id string) error
@@ -31,13 +31,6 @@ type auth0Struct struct {
 	connection string
 }
 
-type Auth0Role struct {
-	ID          string             `json:"id"`
-	Name        string             `json:"name"`
-	Description string             `json:"description"`
-	AuthUsers   []*management.User `json:"authUsers"`
-}
-
 func NewAuth0Session(domain string, client string, secret string, connection string) (Auth0Handler, error) {
 	var err error
 	var session *management.Management
@@ -52,10 +45,9 @@ func NewAuth0Session(domain string, client string, secret string, connection str
 	return a, nil
 }
 
-func (a *auth0Struct) RoleList() ([]Auth0Role, error) {
+func (a *auth0Struct) RoleList() ([]*management.Role, error) {
 	var err error
-	var role Auth0Role
-	var roles []Auth0Role = []Auth0Role{}
+	var roles []*management.Role = []*management.Role{}
 
 	var page int = 0
 	for {
@@ -66,13 +58,7 @@ func (a *auth0Struct) RoleList() ([]Auth0Role, error) {
 			return roles, err
 		}
 
-		for _, authRole := range list.Roles {
-			role.ID = authRole.GetID()
-			role.Name = authRole.GetName()
-			role.Description = authRole.GetDescription()
-
-			roles = append(roles, role)
-		}
+		roles = append(roles, list.Roles...)
 
 		if !list.HasNext() {
 			break
@@ -83,26 +69,22 @@ func (a *auth0Struct) RoleList() ([]Auth0Role, error) {
 	return roles, err
 }
 
-func (a *auth0Struct) RoleShow(id string) (Auth0Role, error) {
+func (a *auth0Struct) RoleShow(id string) (*management.Role, *management.UserList, error) {
 	var err error
-	var role Auth0Role
+	var role *management.Role
+	var users *management.UserList
 
-	authRole, err := a.session.Role.Read(id)
+	role, err = a.session.Role.Read(id)
 	if err != nil {
-		return role, err
+		return role, users, err
 	}
 
-	role.ID = authRole.GetID()
-	role.Name = authRole.GetName()
-	role.Description = authRole.GetDescription()
-
-	users, err := a.session.Role.Users(authRole.GetID())
+	users, err = a.session.Role.Users(role.GetID())
 	if err != nil {
-		return role, err
+		return role, users, err
 	}
-	role.AuthUsers = users.Users
 
-	return role, nil
+	return role, users, nil
 }
 
 func (a *auth0Struct) RoleCreate(name string, description string) error {
