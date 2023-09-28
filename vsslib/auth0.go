@@ -2,6 +2,8 @@ package vsslib
 
 import (
 	"errors"
+	"net/http"
+	"strings"
 
 	"github.com/virsas/lib-go-modules/vssutil"
 	"gopkg.in/auth0.v5"
@@ -17,9 +19,10 @@ type Auth0Handler interface {
 	UserList() ([]*management.User, error)
 	UserShow(id string) (*management.User, error)
 	UserCreate(name string, email string) error
-	UserUpdate(id string, name string, description string) error
+	UserUpdate(id string, name string, email string, passreset bool) error
 	UserBlock(id string) error
 	UserDelete(id string) error
+	PassReset(email string) error
 }
 
 type auth0Struct struct {
@@ -190,10 +193,15 @@ func (a *auth0Struct) UserCreate(name string, email string) error {
 		return err
 	}
 
+	err = a.PassReset(email)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
-func (a *auth0Struct) UserUpdate(id string, name string, email string) error {
+func (a *auth0Struct) UserUpdate(id string, name string, email string, passreset bool) error {
 	var err error
 
 	u := &management.User{
@@ -204,6 +212,13 @@ func (a *auth0Struct) UserUpdate(id string, name string, email string) error {
 	err = a.session.User.Update(id, u)
 	if err != nil {
 		return err
+	}
+
+	if passreset {
+		err = a.PassReset(email)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -237,5 +252,24 @@ func (a *auth0Struct) UserDelete(id string) error {
 		return err
 	}
 
+	return nil
+}
+
+func (a *auth0Struct) PassReset(email string) error {
+	var err error
+
+	url := "https://" + a.domain + "/dbconnections/change_password"
+	payload := strings.NewReader("{\"client_id\": \"" + a.client + "\",\"email\": \"" + email + "\",\"connection\": \"" + a.connection + "\"}")
+
+	req, err := http.NewRequest("POST", url, payload)
+	if err != nil {
+		return err
+	}
+	req.Header.Add("content-type", "application/json")
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	res.Body.Close()
 	return nil
 }
