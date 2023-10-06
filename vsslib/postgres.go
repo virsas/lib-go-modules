@@ -12,11 +12,16 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func NewPostgresSession(dbHost string, dbPort string, dbUser string, dbPass string, dbName string) (*sql.DB, error) {
+func NewPostgresSession(dbHost string, dbPort string, dbUser string, dbPass string, dbName string, ssl bool) (*sql.DB, error) {
 	var err error
 	var db *sql.DB
 
-	dbSource := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s", dbHost, dbPort, dbUser, dbPass, dbName)
+	var sslmode string = "enabled"
+	if !ssl {
+		sslmode = "disabled"
+	}
+
+	dbSource := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", dbHost, dbPort, dbUser, dbPass, dbName, sslmode)
 	db, err = sql.Open("postgres", dbSource)
 	if err != nil {
 		return nil, err
