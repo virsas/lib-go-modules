@@ -16,9 +16,9 @@ func NewPostgresSession(dbHost string, dbPort string, dbUser string, dbPass stri
 	var err error
 	var db *sql.DB
 
-	var sslmode string = "enabled"
+	var sslmode string = "require"
 	if !ssl {
-		sslmode = "disabled"
+		sslmode = "disable"
 	}
 
 	dbSource := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", dbHost, dbPort, dbUser, dbPass, dbName, sslmode)
