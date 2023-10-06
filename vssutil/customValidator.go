@@ -11,14 +11,16 @@ const (
 	AlphaNumSpecialString = `^[a-zA-Z0-9\s` + nonEnglishChars + `!@#$_%^&*.,?()-=+:;|'<>-]+$`
 	SimpleSentenceString  = `^[a-zA-Z0-9\s` + nonEnglishChars + `\.\,\!]+$`
 	AlphaSpaceString      = `^[a-zA-Z0-9\s` + nonEnglishChars + `]+$`
-	LowerWithDashString   = `^[a-z\-]+$`
+	LowerDashString       = `^[a-z\-]+$`
+	AlphaNumDashString    = `^[a-zA-Z0-9\-]+$`
 )
 
 var (
 	AlphaNumSpecialRegex = regexp.MustCompile(AlphaNumSpecialString)
 	SimpleSentenceRegex  = regexp.MustCompile(SimpleSentenceString)
 	AlphaSpaceRegex      = regexp.MustCompile(AlphaSpaceString)
-	LowerWithDashRegex   = regexp.MustCompile(LowerWithDashString)
+	LowerDashRegex       = regexp.MustCompile(LowerDashString)
+	AlphaNumDashRegex    = regexp.MustCompile(AlphaNumDashString)
 )
 
 func AlphaNumSpecialValid(fl validator.FieldLevel) bool {
@@ -30,6 +32,9 @@ func SimpleSentenceValid(fl validator.FieldLevel) bool {
 func AlphaSpaceValid(fl validator.FieldLevel) bool {
 	return AlphaSpaceRegex.MatchString(fl.Field().String())
 }
-func LowerWithDashValid(fl validator.FieldLevel) bool {
-	return LowerWithDashRegex.MatchString(fl.Field().String())
+func LowerDashValid(fl validator.FieldLevel) bool {
+	return LowerDashRegex.MatchString(fl.Field().String())
+}
+func AlphaNumDashValid(fl validator.FieldLevel) bool {
+	return AlphaNumDashRegex.MatchString(fl.Field().String())
 }
