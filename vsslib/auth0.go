@@ -18,7 +18,7 @@ type Auth0Handler interface {
 	RoleDelete(id string) error
 	UserList() ([]*management.User, error)
 	UserShow(id string) (*management.User, error)
-	UserCreate(name string, email string) error
+	UserCreate(name string, email string) (string, error)
 	UserUpdate(id string, name string, email string, passreset bool) error
 	UserBlock(id string) error
 	UserDelete(id string) error
@@ -177,7 +177,7 @@ func (a *auth0Struct) UserShow(id string) (*management.User, error) {
 	return user, nil
 }
 
-func (a *auth0Struct) UserCreate(name string, email string) error {
+func (a *auth0Struct) UserCreate(name string, email string) (string, error) {
 	var err error
 
 	u := &management.User{
@@ -190,15 +190,15 @@ func (a *auth0Struct) UserCreate(name string, email string) error {
 
 	err = a.session.User.Create(u)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	err = a.PassReset(email)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	return u.GetID(), nil
 }
 
 func (a *auth0Struct) UserUpdate(id string, name string, email string, passreset bool) error {
